@@ -15,7 +15,12 @@ class BasicFrequencyCalculator:
                 self.frequency[item] = 1
     
     def generate_output(self):
-        output_df = pd.DataFrame(columns=['item_name', 'frequency'])
+        self.read_dataset()
+        self.calculate_frequency()
+        output_df = pd.DataFrame(columns=['item', 'frequency'])
         for item in self.frequency:
-            output_df = output_df.append({'item_name' : item, 'frequency' : self.frequency[item]}, ignore_index=True)
-        output_df.to_csv('output.csv', index=False)
+            output_df = output_df.append({'item' : item, 'frequency' : self.frequency[item]}, ignore_index=True)
+        output_df.to_csv('ActualFrequency.csv', index=False)
+
+calculator = BasicFrequencyCalculator("ArtificialDataset.csv")
+calculator.generate_output()
