@@ -5,11 +5,19 @@ import math
 import os
 class CountMinSketch:
     # Initialize the object with the dataset path, result path, epsilon and delta values
-    def __init__(self, dataset_path, result_path, epsilon = 0.01, delta = 0.01) -> None:
+    # def __init__(self, dataset_path, result_path, epsilon = 0.01, delta = 0.01) -> None:
+    #     self.dataset_path = dataset_path
+    #     self.result_path = result_path
+    #     self.K = math.ceil(2/epsilon)
+    #     self.N = math.ceil(math.log(1 / delta))
+    #     self.matrix = [[0 for j in range(self.K)] for i in range(self.N)]
+
+
+    def __init__(self, dataset_path, result_path, N, K):#, epsilon = 0.01, delta = 0.01) -> None:
         self.dataset_path = dataset_path
         self.result_path = result_path
-        self.K = math.ceil(2/epsilon)
-        self.N = math.ceil(math.log(1 / delta))
+        self.K = K
+        self.N = N
         self.matrix = [[0 for j in range(self.K)] for i in range(self.N)]
 
     # Read the dataset from the file 
@@ -40,7 +48,7 @@ class CountMinSketch:
     def add_column(self, output_df, column_name):
         output = []
         temp = []
-        for item in self.data['item']:
+        for item in self.data['category']:
             if(item not in temp):
                 temp.append(item)
                 output.append(self.get_frequency(item))
@@ -49,7 +57,7 @@ class CountMinSketch:
 
     # Update the result dataframe with the new results
     def update_df(self, output_df, column_name):
-        for i in self.data['item']:
+        for i in self.data['category']:
             if(i not in output_df['item'].values):
                 output_df = output_df.append({'item' : i, column_name: self.get_frequency(i)}, ignore_index=True)
         return output_df
@@ -57,7 +65,7 @@ class CountMinSketch:
     # Driver function: reads the data set performs CMS and then writes the result into a csv file
     def generate_output(self):
         self.read_dataset()
-        for item in self.data['item']: # Loop through each item in the dataset
+        for item in self.data['category']: # Loop through each item in the dataset
             self.generate_matrix(item) # Generate the matrix
         column_name = "frequency(N" + str(self.N) + "K" + str(self.K) + ")" # Unique name for each column
         if os.path.exists(self.result_path):
@@ -69,5 +77,5 @@ class CountMinSketch:
         # print(output_df)
         output_df.to_csv(self.result_path, index=False)
 
-cms = CountMinSketch("Dataset.csv", "EstimatedFrequency.csv")
+cms = CountMinSketch("./Code/RealWorldDataset.csv", "./Code/EstimatedFrequency.csv", 240, 4800)
 cms.generate_output()
